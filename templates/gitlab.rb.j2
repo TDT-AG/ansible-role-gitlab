@@ -102,6 +102,22 @@ registry_nginx['ssl_certificate'] = "{{ gitlab_registry_nginx_ssl_certificate }}
 registry_nginx['ssl_certificate_key'] = "{{ gitlab_registry_nginx_ssl_certificate_key }}"
 {% endif %}
 
+{% if gitlab_daily_maintenance_disable is defined %}
+# Configure daily maintenance settings
+# https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template#L2662
+gitaly['configuration'] = {
+  daily_maintenance: {
+    disabled: {{ gitlab_daily_maintenance_disable | lower }},
+{% if gitlab_daily_maintenance_disable == false %}
+    start_hour: {{ gitlab_daily_maintenance_start_hour }},
+    start_minute: {{ gitlab_daily_maintenance_start_minute }},
+    duration: '{{ gitlab_daily_maintenance_duration }}',
+    storages: ['default'],
+{% endif %}
+  },
+}
+{% endif %}
+
 {% if gitlab_extra_settings is defined %}
 # Extra configuration
 {% for extra in gitlab_extra_settings %}
